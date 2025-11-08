@@ -1,1 +1,606 @@
-เข้ามาดูหาพ่อมึงอะ
+-- โหลดไลบรารี Fluent (คงเดิม)
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+
+-- หน้าต่างหลัก (คงเดิม)
+local Window = Fluent:CreateWindow({
+    Title = "poshub " .. Fluent.Version,
+    SubTitle = "by cherry._.54",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Acrylic = true,
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
+
+------------------------------------------------------------
+-- 🔹 Mini Dock (ปุ่มเล็กเมื่อย่อ) (คงเดิม)
+------------------------------------------------------------
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "MiniDock"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = game:GetService("CoreGui")
+
+local MiniButton = Instance.new("TextButton")
+MiniButton.Name = "MiniButton"
+MiniButton.Parent = ScreenGui
+MiniButton.Text = "⚙ poshub"
+MiniButton.Font = Enum.Font.GothamBold
+MiniButton.TextColor3 = Color3.fromRGB(255,255,255)
+MiniButton.BackgroundColor3 = Color3.fromRGB(40,40,40)
+MiniButton.BorderSizePixel = 0
+MiniButton.Size = UDim2.new(0, 130, 0, 36)
+MiniButton.Position = UDim2.new(0.02, 0, 0.4, 0)
+MiniButton.Visible = false
+MiniButton.Active = true
+MiniButton.Draggable = true
+
+local Corner = Instance.new("UICorner")
+Corner.CornerRadius = UDim.new(0, 8)
+Corner.Parent = MiniButton
+
+local Stroke = Instance.new("UIStroke")
+Stroke.Color = Color3.fromRGB(120, 120, 255)
+Stroke.Thickness = 1.2
+Stroke.Parent = MiniButton
+
+MiniButton.MouseEnter:Connect(function()
+	MiniButton.BackgroundColor3 = Color3.fromRGB(65,65,85)
+end)
+MiniButton.MouseLeave:Connect(function()
+	MiniButton.BackgroundColor3 = Color3.fromRGB(40,40,40)
+end)
+
+MiniButton.MouseButton1Click:Connect(function()
+	Window:Minimize(false)
+end)
+
+Window.OnMinimize = function(state)
+	MiniButton.Visible = state
+end
+
+------------------------------------------------------------
+-- 🔹 แท็บหลัก (คงเดิม)
+------------------------------------------------------------
+local Tabs = {
+    Aimbot = Window:AddTab({ Title = "Aimbot", Icon = "" }),
+    Esp = Window:AddTab({ Title = "ESP", Icon = "" }),
+    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
+}
+
+local Options = Fluent.Options
+
+------------------------------------------------------------
+-- 🔸 Aimbot Tab (คงเดิม)
+------------------------------------------------------------
+Tabs.Aimbot:AddParagraph({
+    Title = "บิดแล้วรวย",
+    Content = "ใช้เนียนๆเลยพี่ชาย"
+})
+
+local ToggleAimbot = Tabs.Aimbot:AddToggle("AimbotEnabled", { Title = "เปิด/ปิด Aimbot", Default = false }):OnChanged(function()
+    print("Aimbot เปิดปิด:", Options.AimbotEnabled.Value)
+end)
+
+Tabs.Aimbot:AddInput("AimWidth", {
+    Title = "ความกว้าง (FOV)",
+    Default = "100",
+    Placeholder = "พิมพ์ค่า เช่น 100",
+    Numeric = true,
+    Finished = true,
+    Callback = function(Value)
+        print("ความกว้างถูกตั้งค่าเป็น:", Value)
+    end
+})
+
+Tabs.Aimbot:AddDropdown("AimPart", {
+    Title = "ส่วนที่ล็อกเป้า",
+    Values = {"Head (หัว)", "Torso (ตัว)", "RootPart (กลางตัว)"},
+    Multi = false,
+    Default = 1,
+}):OnChanged(function(Value)
+    print("ส่วนที่ล็อกเป้า:", Value)
+end)
+
+
+Tabs.Aimbot:AddDropdown("AimMode", {
+    Title = "เลือกโหมด",
+    Values = {"ล็อกตามไวๆ", "ล็อกช้าๆ", "กลางๆ", "เนียนๆ"},
+    Multi = false,
+    Default = 1,
+}):OnChanged(function(Value)
+    print("โหมดที่เลือก:", Value)
+end)
+
+Tabs.Aimbot:AddInput("Transparency", {
+    Title = "ความโปร่งใส (0-1)",
+    Default = "0.0", 
+    Placeholder = "เช่น 0.0 (ทึบ) - 1.0 (โปร่งใส)",
+    Numeric = true,
+    Finished = true,
+    Callback = function(Value)
+        print("ความโปร่งใส:", Value)
+    end
+})
+
+Tabs.Aimbot:AddToggle("WallHack", { Title = "ทะลุกำแพง", Default = false }):OnChanged(function()
+    print("ทะลุกำแพง:", Options.WallHack.Value)
+end)
+
+Tabs.Aimbot:AddToggle("NoTeamLock", { Title = "ไม่ล็อกทีมเดียวดัน", Default = false }):OnChanged(function()
+    print("ไม่ล็อกทีมเดียวดัน:", Options.NoTeamLock.Value)
+end)
+
+Tabs.Aimbot:AddToggle("QuickToggle", { Title = "ปุ่มเปิดปิดไวๆ (Right Shift)", Default = false }):OnChanged(function()
+    print("ปุ่มเปิดปิดไวๆ:", Options.QuickToggle.Value)
+end)
+
+------------------------------------------------------------
+-- 🔸 ESP Tab (คงเดิม)
+------------------------------------------------------------
+Tabs.Esp:AddParagraph({
+    Title = "ESP System",
+    Content = "ฟังก์ชันช่วยมองศัตรูผ่านกำแพง"
+})
+
+Tabs.Esp:AddToggle("ESP_Name", { Title = "ดูชื่อ", Default = false })
+Tabs.Esp:AddToggle("ESP_Health", { Title = "ดูเลือด", Default = false })
+Tabs.Esp:AddToggle("ESP_Box", { Title = "สี่เหลี่ยมรอบๆ", Default = false })
+Tabs.Esp:AddToggle("ESP_Line", { Title = "เส้นจากตัวเราไปหาคน", Default = false })
+Tabs.Esp:AddToggle("ESP_Glow", { Title = "ตัวเรืองแสงทะลุกำแพง", Default = false })
+Tabs.Esp:AddToggle("ESP_TeamColor", { Title = "สีทีมใช้กับทุกอัน", Default = false })
+
+------------------------------------------------------------
+-- 🔹 Settings / SaveManager (คงเดิม)
+------------------------------------------------------------
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
+InterfaceManager:SetFolder("FluentScriptHub")
+SaveManager:SetFolder("FluentScriptHub/specific-game")
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+SaveManager:BuildConfigSection(Tabs.Settings)
+
+Window:SelectTab(1)
+
+Fluent:Notify({
+    Title = "poshub",
+    Content = "โหลดสำเร็จ! (LeftControl: ย่อ/ขยาย | RightShift: QuickToggle Aimbot)",
+    Duration = 8
+})
+
+SaveManager:LoadAutoloadConfig()
+
+
+------------------------------------------------------------
+-- 🛠️ Global Variables (คงเดิม)
+------------------------------------------------------------
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+
+------------------------------------------------------------
+-- ⭕ FOV Circle (วงล็อกเป้า - คงเดิม)
+------------------------------------------------------------
+local FOV_ScreenGui = Instance.new("ScreenGui")
+FOV_ScreenGui.Name = "FOV_ScreenGui"
+FOV_ScreenGui.IgnoreGuiInset = true
+FOV_ScreenGui.ResetOnSpawn = false
+FOV_ScreenGui.Parent = game:GetService("CoreGui")
+
+local FOVCircle = Instance.new("Frame")
+FOVCircle.Name = "FOVCircle"
+FOVCircle.Parent = FOV_ScreenGui
+FOVCircle.BackgroundTransparency = 1
+FOVCircle.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+FOVCircle.BorderSizePixel = 0 
+FOVCircle.ZIndex = 1
+FOVCircle.AnchorPoint = Vector2.new(0.5, 0.5)
+FOVCircle.Position = UDim2.new(0.5, 0, 0.5, 0)
+
+local FOV_Corner = Instance.new("UICorner")
+FOV_Corner.Parent = FOVCircle
+
+local FOV_Stroke = Instance.new("UIStroke")
+FOV_Stroke.Parent = FOVCircle
+FOV_Stroke.Color = Color3.fromRGB(0, 0, 0)
+FOV_Stroke.Thickness = 1.5 
+FOV_Stroke.Transparency = 0 
+
+RunService.RenderStepped:Connect(function()
+    local aimWidth = tonumber(Options.AimWidth.Value) or 100
+    local transparency = tonumber(Options.Transparency.Value) or 0.0 
+    local isEnabled = Options.AimbotEnabled.Value
+
+    FOVCircle.Size = UDim2.fromOffset(aimWidth * 2, aimWidth * 2)
+    FOV_Corner.CornerRadius = UDim.new(1, 0)
+
+    FOV_Stroke.Transparency = transparency
+    
+    FOVCircle.Visible = isEnabled
+end)
+
+
+------------------------------------------------------------
+-- 🎯 ฟังก์ชัน Aimbot (Logic - แก้ไข Raycasting)
+------------------------------------------------------------
+
+local function GetSmoothingFactor()
+    local mode = Options.AimMode.Value
+    if mode == "ล็อกตามไวๆ" then
+        return 1.0
+    elseif mode == "ล็อกช้าๆ" then
+        return 0.08 
+    elseif mode == "กลางๆ" then
+        return 0.3
+    elseif mode == "เนียนๆ" then
+        return 0.15
+    end
+    return 1.0
+end
+
+local function GetAimPartName()
+    local part = Options.AimPart.Value
+    if part == "Head (หัว)" then
+        return "Head"
+    elseif part == "Torso (ตัว)" then
+        -- Torso ส่วนใหญ่คือ UpperTorso ใน R15 หรือ Torso ใน R6
+        local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+        if char:FindFirstChild("UpperTorso") then
+            return "UpperTorso"
+        else
+            return "Torso"
+        end
+    else
+        return "HumanoidRootPart"
+    end
+end
+
+
+local function GetClosestTarget()
+    local aimWidth = tonumber(Options.AimWidth.Value) or 100
+    local closestDistance = aimWidth
+    local targetPlayer = nil
+    local aimPartName = GetAimPartName()
+    
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChildOfClass("Humanoid") and player.Character:FindFirstChildOfClass("Humanoid").Health > 0 then
+            if not Options.NoTeamLock.Value or player.Team ~= LocalPlayer.Team then
+                local targetPart = player.Character:FindFirstChild(aimPartName) 
+                if targetPart then
+                    local pos, onScreen = Camera:WorldToViewportPoint(targetPart.Position)
+                    
+                    if onScreen then
+                        local center = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
+                        local distance = (Vector2.new(pos.X, pos.Y) - center).Magnitude
+                        
+                        if distance < aimWidth then
+                            if distance < closestDistance then
+                                closestDistance = distance
+                                targetPlayer = player
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return targetPlayer
+end
+
+RunService.RenderStepped:Connect(function()
+    if Options.AimbotEnabled.Value then
+        local target = GetClosestTarget()
+        
+        if target and target.Character then
+            local aimPartName = GetAimPartName()
+            local targetPart = target.Character:FindFirstChild(aimPartName)
+            
+            if targetPart then
+                local targetPos = targetPart.Position
+                local shouldAim = false
+
+                if Options.WallHack.Value then
+                    shouldAim = true
+                else
+                    -- **Raycasting Logic ที่แก้ไขให้ทำงานได้เมื่อมองเห็น**
+                    local rayOrigin = Camera.CFrame.Position
+                    local rayDirection = (targetPos - rayOrigin)
+                    local rayDistance = rayDirection.Magnitude
+                    
+                    local rayParams = RaycastParams.new()
+                    rayParams.FilterType = Enum.RaycastFilterType.Exclude
+                    
+                    -- กรองตัวเราและเป้าหมายออกจาก Raycast
+                    rayParams.FilterDescendantsInstances = {LocalPlayer.Character, target.Character}
+                    
+                    local raycastResult = workspace:Raycast(rayOrigin, rayDirection.Unit * rayDistance, rayParams)
+                    
+                    if not raycastResult then
+                        -- กรณี 1: ไม่ชนอะไรเลย (มองเห็นชัดเจน)
+                        shouldAim = true
+                    else
+                        -- กรณี 2: ชนวัตถุ, ตรวจสอบว่าวัตถุที่ชนอยู่ไกลกว่าเป้าหมายหรือไม่
+                        -- หรือชนส่วนที่สำคัญของเป้าหมาย (เช่นถ้า Raycast ชน TargetPart เอง แสดงว่ามองเห็น)
+                        local hitInstance = raycastResult.Instance
+                        if hitInstance:IsDescendantOf(target.Character) then
+                            -- ชนส่วนอื่นของเป้าหมายเอง (เช่น Arm/Leg) ซึ่งโอเค
+                            shouldAim = true
+                        elseif raycastResult.Distance >= rayDistance - 0.2 then
+                            -- ชนวัตถุภายนอก แต่ห่างจากเป้าหมายน้อยมาก (ถือว่ามองเห็น)
+                            shouldAim = true
+                        end
+                    end
+                end
+
+                if shouldAim then
+                    local smoothing = GetSmoothingFactor()
+                    local currentCFrame = Camera.CFrame
+                    local desiredCFrame = CFrame.new(currentCFrame.Position, targetPos)
+                    
+                    Camera.CFrame = currentCFrame:Lerp(desiredCFrame, smoothing)
+                end
+            end
+        end
+    end
+end)
+
+UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+    if input.KeyCode == Enum.KeyCode.RightShift and Options.QuickToggle.Value and not gameProcessedEvent then
+        Options.AimbotEnabled.Value = not Options.AimbotEnabled.Value
+        ToggleAimbot:SetValue(Options.AimbotEnabled.Value)
+        Fluent:Notify({
+            Title = "QuickToggle",
+            Content = "Aimbot: " .. (Options.AimbotEnabled.Value and "เปิด" or "ปิด"),
+            Duration = 2
+        })
+    end
+end)
+
+------------------------------------------------------------
+-- 🌟 ฟังก์ชัน ESP (Logic - แก้ไข UI ค้าง)
+------------------------------------------------------------
+local ESPGui = Instance.new("ScreenGui")
+ESPGui.Name = "poshub_ESP_GUI"
+ESPGui.IgnoreGuiInset = true
+ESPGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ESPGui.ResetOnSpawn = false
+ESPGui.Parent = game:GetService("CoreGui")
+
+local ESPDrawings = {}
+
+local function GetESPColor(player)
+    if Options.ESP_TeamColor.Value and player.Team then
+        return player.Team.TeamColor.Color
+    end
+    if player.Team ~= LocalPlayer.Team then
+        return Color3.fromRGB(255, 0, 0)
+    end
+    return Color3.fromRGB(0, 255, 0)
+end
+
+local function Update2DESP(player, rootPart, color)
+    local draw = ESPDrawings[player.UserId]
+    if not draw or not draw.NameLabel or not draw.NameLabel.Parent then
+        draw = {
+            NameLabel = Instance.new("TextLabel"),
+            HealthBarBG = Instance.new("Frame"),
+            HealthBarFG = Instance.new("Frame"),
+            BoxFrame = Instance.new("Frame"),
+            LineFrame = Instance.new("Frame")
+        }
+        
+        draw.NameLabel.Parent = ESPGui
+        draw.NameLabel.BackgroundTransparency = 1
+        draw.NameLabel.TextScaled = true
+        draw.NameLabel.Font = Enum.Font.SourceSans
+        draw.NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        draw.NameLabel.ZIndex = 3
+        
+        draw.HealthBarBG.Parent = ESPGui
+        draw.HealthBarBG.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        draw.HealthBarBG.BackgroundTransparency = 0.3
+        draw.HealthBarBG.BorderSizePixel = 0
+        draw.HealthBarBG.ZIndex = 2
+
+        draw.HealthBarFG.Parent = draw.HealthBarBG
+        draw.HealthBarFG.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        draw.HealthBarFG.BorderSizePixel = 0
+        draw.HealthBarFG.ZIndex = 3
+        
+        draw.BoxFrame.Parent = ESPGui
+        draw.BoxFrame.BackgroundTransparency = 1
+        draw.BoxFrame.BorderSizePixel = 1
+        draw.BoxFrame.BorderColor3 = color
+        draw.BoxFrame.ZIndex = 2
+        
+        draw.LineFrame.Parent = ESPGui
+        draw.LineFrame.BackgroundTransparency = 0
+        draw.LineFrame.BorderSizePixel = 0
+        draw.LineFrame.BackgroundColor3 = color
+        draw.LineFrame.ZIndex = 2
+
+        ESPDrawings[player.UserId] = draw
+    end
+
+    local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then 
+        -- ซ่อนทั้งหมดถ้าไม่มี humanoid
+        for _, obj in pairs(draw) do
+            if type(obj) == 'Instance' and obj.Parent == ESPGui then
+                obj.Visible = false
+            end
+        end
+        return 
+    end
+
+    local headPos, headOnScreen = Camera:WorldToViewportPoint(rootPart.Position + Vector3.new(0, 2.5, 0))
+    local footPos, footOnScreen = Camera:WorldToViewportPoint(rootPart.Position - Vector3.new(0, 2.5, 0))
+
+    local onScreen = headOnScreen or footOnScreen
+    
+    -- กำหนดค่าพื้นฐาน
+    local isVisible = onScreen 
+    local height = math.abs(headPos.Y - footPos.Y)
+    local width = height * 0.5 
+
+    local boxCenter = Vector2.new(footPos.X, footPos.Y - height/2)
+    local boxPosition = UDim2.fromOffset(boxCenter.X - width/2, boxCenter.Y - height/2)
+    local boxSize = UDim2.fromOffset(width, height)
+
+
+    -- === Box ESP ===
+    -- *** แก้ไขให้ Visible ขึ้นอยู่กับ OnScreen และ Option.Value ***
+    draw.BoxFrame.Visible = Options.ESP_Box.Value and isVisible
+    if draw.BoxFrame.Visible then
+        draw.BoxFrame.Position = boxPosition
+        draw.BoxFrame.Size = boxSize
+        draw.BoxFrame.BorderColor3 = color
+    else
+         draw.BoxFrame.Size = UDim2.new(0,0,0,0) -- ขนาด 0 เมื่อปิด
+    end
+    
+    -- === Name ESP ===
+    draw.NameLabel.Visible = Options.ESP_Name.Value and isVisible
+    if draw.NameLabel.Visible then
+        draw.NameLabel.Position = UDim2.fromOffset(boxCenter.X - width/2, boxPosition.Y.Offset - 15)
+        draw.NameLabel.Size = UDim2.fromOffset(width, 15)
+        draw.NameLabel.Text = player.Name
+        draw.NameLabel.TextColor3 = color
+    else
+         draw.NameLabel.Size = UDim2.new(0,0,0,0)
+    end
+
+    -- === Health ESP ===
+    draw.HealthBarBG.Visible = Options.ESP_Health.Value and isVisible
+    if draw.HealthBarBG.Visible then
+        local health = humanoid.Health / humanoid.MaxHealth
+        local barHeight = height
+        local barWidth = 3
+        
+        draw.HealthBarBG.Position = UDim2.fromOffset(boxPosition.X.Offset - barWidth - 2, boxPosition.Y.Offset)
+        draw.HealthBarBG.Size = UDim2.fromOffset(barWidth, barHeight)
+
+        draw.HealthBarFG.Size = UDim2.new(1, 0, health, 0)
+        draw.HealthBarFG.Position = UDim2.new(0, 0, 1 - health, 0) 
+        draw.HealthBarFG.BackgroundColor3 = Color3.fromHSV(health / 3, 1, 1)
+    else
+         draw.HealthBarBG.Size = UDim2.new(0,0,0,0)
+    end
+    
+    -- === Line ESP ===
+    draw.LineFrame.Visible = Options.ESP_Line.Value and isVisible
+    if draw.LineFrame.Visible then
+        local myRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if myRoot then
+            local myPos, myOnScreen = Camera:WorldToViewportPoint(myRoot.Position)
+            
+            if myOnScreen then
+                local lineStart = Vector2.new(myPos.X, myPos.Y)
+                local lineEnd = Vector2.new(footPos.X, footPos.Y)
+                local distance = (lineStart - lineEnd).Magnitude
+                
+                local angle = math.atan2(lineEnd.Y - lineStart.Y, lineEnd.X - lineStart.X)
+                
+                draw.LineFrame.Position = UDim2.fromOffset(lineStart.X, lineStart.Y)
+                draw.LineFrame.Size = UDim2.fromOffset(distance, 1.5)
+                draw.LineFrame.Rotation = math.deg(angle)
+                draw.LineFrame.BackgroundColor3 = color
+                draw.LineFrame.AnchorPoint = Vector2.new(0, 0.5)
+            else
+                draw.LineFrame.Visible = false
+            end
+        else
+             draw.LineFrame.Visible = false
+        end
+    else
+         draw.LineFrame.Visible = false
+    end
+end
+
+local function UpdateGlowESP(player, color)
+    local draw = ESPDrawings[player.UserId] or {}
+    local highlight = draw.Highlight
+    local glowEnabled = Options.ESP_Glow.Value
+    
+    if glowEnabled and player.Character then
+        if not highlight or not highlight.Parent then
+            highlight = Instance.new("Highlight")
+            highlight.Parent = player.Character
+            draw.Highlight = highlight
+            ESPDrawings[player.UserId] = draw
+        end
+        highlight.FillColor = color
+        highlight.OutlineColor = color
+        highlight.OutlineTransparency = 0.5
+        highlight.FillTransparency = 0.5
+        highlight.Enabled = true
+    else
+        if highlight then
+            highlight.Enabled = false
+        end
+    end
+end
+
+RunService.Heartbeat:Connect(function()
+    for _, player in pairs(Players:GetPlayers()) do
+        local character = player.Character
+        local draw = ESPDrawings[player.UserId]
+
+        local shouldShow = player ~= LocalPlayer and 
+                           character and 
+                           character:FindFirstChild("HumanoidRootPart") and 
+                           character:FindFirstChildOfClass("Humanoid") and 
+                           character:FindFirstChildOfClass("Humanoid").Health > 0 and
+                           (not Options.NoTeamLock.Value or player.Team ~= LocalPlayer.Team)
+
+        if shouldShow then
+            local rootPart = character:FindFirstChild("HumanoidRootPart")
+            local color = GetESPColor(player)
+            
+            ESPDrawings[player.UserId] = ESPDrawings[player.UserId] or {}
+            
+            Update2DESP(player, rootPart, color)
+            UpdateGlowESP(player, color)
+        else
+            -- 🌟 สั่งซ่อน/ปิด Highlight และ UI ทันที ถ้าไม่ควรแสดง
+            if draw then
+                for _, obj in pairs(draw) do
+                    if type(obj) == 'Instance' and obj.Parent == ESPGui then
+                        obj.Visible = false
+                    elseif obj.ClassName == "Highlight" then
+                        obj.Enabled = false
+                    end
+                end
+            end
+        end
+    end
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+    if ESPDrawings[player.UserId] then
+        for _, obj in pairs(ESPDrawings[player.UserId]) do
+            if obj then
+                obj:Destroy()
+            end
+        end
+        ESPDrawings[player.UserId] = nil
+    end
+end)
+
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function(character)
+        if ESPDrawings[player.UserId] then
+             for _, obj in pairs(ESPDrawings[player.UserId]) do
+                if obj then
+                    obj:Destroy()
+                end
+            end
+            ESPDrawings[player.UserId] = nil
+        end
+    end)
+end)
